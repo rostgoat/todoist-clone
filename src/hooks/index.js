@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { firebase } from "../firebase";
-import { collatedTasksExists } from "../helpers";
+import { collatedTasksExist } from "../helpers";
 import moment from "moment";
 
 export const useTasks = (selectedProject) => {
@@ -11,10 +11,10 @@ export const useTasks = (selectedProject) => {
     let unsubscribe = firebase
       .firestore()
       .collection("tasks")
-      .where("userId", "==", "sadf42qr3fadsc988dj123dj1832d32");
+      .where("userId", "==", "jlIFXIwyAL3tzHMtzRbw");
 
     unsubscribe =
-      selectedProject && !collatedTasksExists(selectedProject)
+      selectedProject && !collatedTasksExist(selectedProject)
         ? (unsubscribe = unsubscribe.where("projectId", "==", selectedProject))
         : selectedProject === "TODAY"
         ? (unsubscribe = unsubscribe.where(
@@ -26,19 +26,21 @@ export const useTasks = (selectedProject) => {
         ? (unsubscribe = unsubscribe.where("date", "==", ""))
         : unsubscribe;
 
-    unsubscribe = unsubscribe.onSnapShot((snapshot) => {
+    unsubscribe = unsubscribe.onSnapshot((snapshot) => {
       const newTasks = snapshot.docs.map((task) => ({
         id: task.id,
         ...task.data(),
       }));
 
-      setTasks(selectedProject === "NEXT_7")
-        ? newTasks.filter(
-            (task) =>
-              moment(task.date, "DD-MM-YYYY").diff(moment(), "days") <= 7 &&
-              task.archived !== true
-          )
-        : newTasks.filter((task) => task.archived !== true);
+      setTasks(
+        selectedProject === "NEXT_7"
+          ? newTasks.filter(
+              (task) =>
+                moment(task.date, "DD-MM-YYYY").diff(moment(), "days") <= 7 &&
+                task.archived !== true
+            )
+          : newTasks.filter((task) => task.archived !== true)
+      );
       setArchivedTasks(newTasks.filter((task) => task.archived !== false));
     });
 
@@ -47,7 +49,6 @@ export const useTasks = (selectedProject) => {
 
   return { tasks, archivedTasks };
 };
-
 export const useProjects = () => {
   const [projects, setProjects] = useState([]);
 
