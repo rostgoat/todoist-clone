@@ -1,10 +1,10 @@
 import React from "react";
-import { SideBar } from "./SideBar";
+import { Sidebar } from "./Sidebar";
 import { Tasks } from "../Tasks";
 
 export const Content = () => (
-  <section>
-    <SideBar />
+  <section className="content">
+    <Sidebar />
     <Tasks />
   </section>
 );
